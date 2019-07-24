@@ -1,0 +1,13 @@
+[Unit]
+Description=uzblmonitor service
+After=uzblmonitor.service
+
+[Service]
+User=root
+TimeoutStartSec=120
+ExecStartPre=/bin/sleep 90
+ExecStart=/bin/bash /etc/uzblmonitor-refresh.sh
+Restart=always
+
+[Install]
+WantedBy=graphical.target

@@ -98,9 +98,13 @@ class uzblmonitor(
     mode   => '0755',
     source => 'puppet:///modules/uzblmonitor/uzblmonitor',
   }
+
   if $::systemd {
     systemd::unit_file { 'uzblmonitor.service':
       content =>  template('uzblmonitor/uzblmonitor.service.erb')
+    }
+    systemd::unit_file { 'uzblmonitor-refresh.service':
+      content =>  file('uzblmonitor/uzblmonitor-refresh.service')
     }
   } else {
     file { '/etc/default/uzblmonitor':
@@ -119,6 +123,11 @@ class uzblmonitor(
     enable  => true,
     ensure  => running,
     require => Service['nodm-uzblmonitor'],
+  }
+  service { 'uzblmonitor-refresh':
+    enable  => true,
+    ensure  => running,
+    require => Service['uzblmonitor'],
   }
 
   if $browser == 'luakit' {
