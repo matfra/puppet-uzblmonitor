@@ -128,7 +128,6 @@ class Chrome():
         tempdir = tempfile.mkdtemp()
         user_data_dir = os.path.join(tempdir, 'user_data')
         os.mkdir(user_data_dir)
-        self.set_zoom(user_data_dir)
         userscript_args = self.load_userscripts(config, tempdir)
 
         return (
@@ -137,26 +136,12 @@ class Chrome():
                 "--no-default-browser-check",
                 "--no-first-run",
                 "--autoplay-policy=no-user-gesture-required",
+                "--force-device-scale-factor=%s" % self.zoom,
                 "--user-data-dir=%s" % user_data_dir,
                 "--app=%s" % insert_basic_auth(self.url),
             ] + userscript_args,
             {}
         )
-
-    def set_zoom(self, user_data_dir):
-        prefs_filename = os.path.join(user_data_dir, "Default", "Preferences")
-        os.mkdir(os.path.join(user_data_dir, "Default"))
-        with open(prefs_filename, "w") as f:
-            json.dump(
-                {
-                    "partition": {
-                        "default_zoom_level": {
-                            "0": math.log(float(self.zoom)) / math.log(1.20),
-                        }
-                    }
-                },
-                f
-            )
 
     def load_userscripts(self, config, tempdir):
         extension_dir = os.path.join(tempdir, "userscripts")
